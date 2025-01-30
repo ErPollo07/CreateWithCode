@@ -1,60 +1,40 @@
 using System;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class CameraController : MonoBehaviour
 {
     public GameObject cam;
+
+    private float movmentSpeed;
     public float normalSpeed;
     public float fastSpeed;
-    private float movmentSpeed;
+    
     public float movmentTime;
-    public Vector3 cameraPosOffset;
-    public Quaternion cameraRotOffset;
+    public float rotationAmount;
+    private Vector3 zoomAmount;
+
+    private Vector3 newPosition;
+    private Quaternion newRotation;
+    private Vector3 newZoom;
+    
 
     void Start()
     {
-        cam.transform.position = cameraPosOffset;
-        cam.transform.rotation = cameraRotOffset;
+        newPosition = transform.position;
+        newRotation = transform.rotation;
+        newZoom = cam.transform.localPosition;
     }
 
     void Update()
     {
-        // Lock the mouse and set the 
-        if (Input.GetMouseButton(1))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
-
-            #region Fix
-            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y + mouseX, transform.rotation.z);
-            cam.transform.rotation = Quaternion.Euler(cam.transform.rotation.x + mouseY, transform.rotation.y, transform.rotation.z);
-            #endregion
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
-        // Adjust camera rotation
-        cam.transform.rotation = new Quaternion(
-            transform.rotation.x + cameraRotOffset.x,
-            transform.rotation.y + cameraRotOffset.y,
-            transform.rotation.z + cameraRotOffset.z,
-            1
-        );
-
-        Move();
+        HandleMovment();
     }
 
-    void Move()
+    void HandleMovment()
     {
-        Vector3 newPosition = transform.position;
-
         if (Input.GetKey(KeyCode.LeftShift))
         {
             movmentSpeed = fastSpeed;
@@ -81,6 +61,16 @@ public class CameraController : MonoBehaviour
             newPosition += Vector3.right * movmentSpeed;
         }
 
-        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movmentTime);
+        if (Input.GetKey(KeyCode.Q))
+        {
+            newRotation *= Quaternion.Euler(Vector3.up * rotationAmount);
+        }
+        if (Input.GetKey(KeyCode.E))
+        {
+            newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount);
+        }
+
+        transform.position = newPosition;
+        transform.rotation = newRotation;
     }
 }
