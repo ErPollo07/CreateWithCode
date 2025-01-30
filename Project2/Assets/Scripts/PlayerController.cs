@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Input;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +12,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        float horizontalInput =  Input.GetAxis(“Horizontal”);
     }
 }
